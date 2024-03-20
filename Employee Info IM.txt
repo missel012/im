@@ -69,6 +69,12 @@ VALUES (generate_employee_id(2020), 'Anna'),
        (generate_employee_id(2023), 'Rod'),
        (generate_employee_id(2024), 'Shiela'),
        (generate_employee_id(2024), 'Troy');
+       (generate_employee_id(2024), 'Joy'),
+       (generate_employee_id(2024), 'Zea'),
+       (generate_employee_id(2025), 'Dianne'),
+       (generate_employee_id(2025), 'Monica'),
+       (generate_employee_id(2025), 'Jay'),
+       (generate_employee_id(2025), 'Prince'),
 
 2.) 2. Write a procedure that updates the manager of an employee.
 Take note that each manager must handle at least 5employees but should not exceed 15employees.
@@ -162,6 +168,45 @@ LEFT JOIN Employee m ON e.manager = m.eno
 ORDER BY e.eno
 LIMIT 10;
 
+-- sample queries
 
+SELECT e.*, m.name AS manager_name 
+FROM employee e
+LEFT JOIN Employee m ON e.manager = m.eno
+WHERE e.manager is NULL
+ORDER BY e.eno
+LIMIT 10;
+
+-- prepare
+
+
+SELECT name, statement, parameter_types
+FROM pg_prepared_statements
+
+PREPARE get_employee_by_manager (VARCHAR(10)) AS
+	SELECT eno, name
+	FROM employee
+	WHERE manager = $1
+	LIMIT 5;
+
+EXECUTE get_employee_by_manager ('2020-0001');
+
+DEALLOCATE get_employee_by_manager;
+
+--another sample
+
+PREPARE get_employee_by_year (INT) AS
+SELECT *
+FROM employee
+WHERE LEFT(eno, 4):: INT = $1
+LIMIT 5;
+
+EXECUTE get_employee_by_year (2024);
+
+DEALLOCATE get_employee_by_year;
+
+CREATE INDEX IF NOT EXISTS idx_employee_eno ON Employee (eno);
+CREATE INDEX IF NOT EXISTS idx_employee_name ON Employee (name);
+CREATE INDEX IF NOT EXISTS idx_employee_manager ON Employee (manager);
 
 
